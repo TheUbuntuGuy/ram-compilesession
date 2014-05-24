@@ -1,0 +1,228 @@
+#!/bin/bash
+
+###############################################################################
+
+# Clementine-Player RAMdisk Compile Manager
+# Version 0.1
+#
+# Copyright 2014 Mark Furneaux, Romaco Canada
+
+###############################################################################
+
+# CONFIG ----------------------------------------------------------------------
+
+# The following are the only parameters you *should* need to configure for
+# your system.
+
+# Where the ramdisk will be mounted
+RAMDISKMNTPT="/mnt"
+# The directory under the mountpoint for the build files
+RAMDISKDIR="/mnt/clementine-ram"
+# The non-volatile directory for saving the ramdisk contents
+NVDISKDIR="/media/mark/storage/Projects/clementine-ram"
+# The non-volatile directory containing the root of the project
+NVSOURCEDIR="/media/mark/storage/Projects/clementine-tug"
+# The size of the ramdisk. Takes parameters such as k, m, g, t.
+# Be careful to not use too much available RAM
+RAMDISKSIZE="2g"
+# The owner of any files and folders this script needs to create
+FILEOWNER="mark"
+# The group of any files and folders this script needs to create
+# In most cases, set this to the same as the owner
+FILEGROUP="mark"
+
+###############################################################################
+
+function printHelp {
+	echo "Usage: clemetine-ramsession <action>
+
+Where <action> can be one of the following:
+    loadsession    : Creates a ramdisk and loads the previous cmake files
+                     into it if they exist, or creates them if they don't
+    saveram        : Saves the contents of the ramdisk onto disk
+    endsession     : Saves the contents of the ramdisk onto disk and
+                     destroys the ramdisk
+
+    createramdisk  : Creates an empty ramdisk
+    destroyramdisk : Destroys the ramdisk
+
+You will need root access to create/destroy ramdisks
+
+The ramdisk is mounted to: $RAMDISKMNTPT
+The ramdisk directory is: $RAMDISKDIR
+The ramdisk save directory is: $NVDISKDIR
+The source directory is: $NVSOURCEDIR
+The size of the ramdisk is: $RAMDISKSIZE
+The owner of the build files should be: $FILEOWNER
+The group of the build files should be: $FILEGROUP"
+}
+
+function checkRoot {
+if [ $(whoami) != "root" ]
+then
+	echo "You need to be root to create/destroy ramdisks. Halted."
+	exit 1
+fi
+}
+
+function saveRam {
+	if [ ! -d $RAMDISKDIR ]; then
+		echo "ramdisk files do not exist. Halted."
+		exit 12
+	fi
+
+	if [ ! -d $NVDISKDIR ]; then
+		echo "Destination directory does not exist. Creating..."
+		mkdir $NVDISKDIR
+		if [ ! $? -eq 0 ]; then
+			echo "Could not mkdir on disk. Halted."
+			exit 8
+		fi
+		chown -R $FILEOWNER:$FILEGROUP $NVDISKDIR
+		if [ ! $? -eq 0 ]; then
+			echo "Could not chown on disk. Halted."
+			exit 9
+		fi
+	fi
+
+	cp -rpu $RAMDISKDIR $NVDISKDIR/../
+	if [ ! $? -eq 0 ]; then
+		echo "Saving ram files failed. Halted."
+		exit 10
+	fi
+}
+
+function loadRam {
+	if [ ! -d $NVDISKDIR ]; then
+		echo "Source directory does not exist. Creating..."
+		mkdir $NVDISKDIR
+		if [ ! $? -eq 0 ]; then
+			echo "Could not mkdir on disk. Halted."
+			exit 8
+		fi
+		chown -R mark:mark $NVDISKDIR
+		if [ ! $? -eq 0 ]; then
+			echo "Could not chown on disk. Halted."
+			exit 9
+		fi
+	fi
+	cp -rp $NVDISKDIR $RAMDISKMNTPT
+	if [ ! $? -eq 0 ]; then
+			echo "Loading ram files failed. Halted."
+			exit 3
+	fi
+}
+
+if [ $# -ne 1 ]
+then
+	printHelp
+	exit 0
+fi
+
+echo "
+Clementine-Player RAMdisk Compile Manager
+Version 0.1
+Copyright 2014 Mark Furneaux, Romaco Canada
+"
+
+case "$1" in
+
+	-h|--help)
+		printHelp
+		;;
+
+	loadsession)
+		checkRoot
+		printf "Creating ramdisk..."
+		#TODO check if we have enough free ram
+		mount -t tmpfs -o size=$RAMDISKSIZE tmpfs $RAMDISKMNTPT
+		if [ ! $? -eq 0 ]; then
+			echo "Creation of ramdisk failed. Halted."
+			exit 2
+		fi
+		printf " Done\n"
+		printf "Loading session from disk..."
+		loadRam
+		printf " Done\n"
+		if [ ! -s $RAMDISKDIR/Makefile ]
+		then
+			echo "Makefile not found. Running cmake..."
+			if [ ! -d $RAMDISKDIR ]; then
+				mkdir $RAMDISKDIR
+				if [ ! $? -eq 0 ]; then
+					echo "Could not mkdir in ramdisk. Halted."
+					exit 5
+				fi
+				chown -R $FILEOWNER:$FILEGROUP $RAMDISKDIR
+				if [ ! $? -eq 0 ]; then
+					echo "Could not chown in ramdisk. Halted."
+					exit 7
+				fi
+			fi
+			cd $RAMDISKDIR
+			if [ ! $? -eq 0 ]; then
+				echo "Could not cd into ramdisk. Halted."
+				exit 4
+			fi
+			cmake $NVSOURCEDIR
+			if [ ! $? -eq 0 ]; then
+				echo "cmake failed. Halted."
+				exit 6
+			fi
+			chown -R $FILEOWNER:$FILEGROUP $RAMDISKDIR
+			if [ ! $? -eq 0 ]; then
+				echo "Could not chown in ramdisk. Halted."
+				exit 7
+			fi
+			printf " Done\n"
+		fi
+		;;
+
+	saveram)
+		printf "Saving ramdisk contents to disk..."
+		saveRam
+		printf " Done\n"
+		;;
+
+	endsession)
+		checkRoot
+		printf "Saving ramdisk contents to disk..."
+		saveRam
+		printf " Done\n"
+		printf "Unmounting ramdisk..."
+		umount $RAMDISKMNTPT
+		if [ ! $? -eq 0 ]; then
+			echo "Could not umount ramdisk. Halted."
+			exit 11
+		fi
+		printf " Done\n"
+		;;
+
+	createramdisk)
+		checkRoot
+		printf "Creating ramdisk..."
+		#TODO check if we have enough free ram
+		mount -t tmpfs -o size=$RAMDISKSIZE tmpfs $RAMDISKMNTPT
+		if [ ! $? -eq 0 ]; then
+			echo "Creation of ramdisk failed. Halted."
+			exit 2
+		fi
+		printf " Done\n"
+		;;
+
+	destroyramdisk)
+		checkRoot
+		printf "Destroying ramdisk..."
+		umount $RAMDISKMNTPT
+		if [ ! $? -eq 0 ]; then
+			echo "Could not umount ramdisk. Halted."
+			exit 11
+		fi
+		printf " Done\n"
+		;;
+
+	*)
+		printf "Unknown action \"$1\"\n\n"
+		printHelp
+		;;
+esac
