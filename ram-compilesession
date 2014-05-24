@@ -2,7 +2,7 @@
 
 ###############################################################################
 
-# Clementine-Player RAMdisk Compile Manager
+# RAMdisk Compile Manager
 # Version 0.1
 #
 # Copyright 2014 Mark Furneaux, Romaco Canada
@@ -34,7 +34,7 @@ FILEGROUP="mark"
 ###############################################################################
 
 function printHelp {
-	echo "Usage: clemetine-ramsession <action>
+	echo "Usage: ram-compilesession <action>
 
 Where <action> can be one of the following:
     loadsession    : Creates a ramdisk and loads the previous cmake files
@@ -120,7 +120,7 @@ then
 fi
 
 echo "
-Clementine-Player RAMdisk Compile Manager
+RAMdisk Compile Manager
 Version 0.1
 Copyright 2014 Mark Furneaux, Romaco Canada
 "
