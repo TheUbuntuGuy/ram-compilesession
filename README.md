@@ -50,6 +50,10 @@ This saves the contents of the ramdisk to nonvolatile storage and destroys the r
 Open the ram-compilesession file and at the top are 7 parameters that can be changed.
 They are all explained in the file. Be sure to set these before running anything!
 
+Be sure to make it executable by running:
+
+    # chmod +x ram-compilesession
+
 ### Notes
 
 This is definitely not as polished as I would like it to be. More work needs to be done, and more features need to be added. These will come with time.

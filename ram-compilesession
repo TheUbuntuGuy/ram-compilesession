@@ -61,7 +61,7 @@ function checkRoot {
 if [ $(whoami) != "root" ]
 then
 	echo "You need to be root to create/destroy ramdisks."
-	echo "Maybe try sudo ./ram-compilesession"
+	echo "Maybe try \"sudo ./ram-compilesession\""
 	echo "Halted."
 	exit 1
 fi
