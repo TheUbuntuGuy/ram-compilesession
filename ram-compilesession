@@ -60,7 +60,9 @@ The group of the build files should be: $FILEGROUP"
 function checkRoot {
 if [ $(whoami) != "root" ]
 then
-	echo "You need to be root to create/destroy ramdisks. Halted."
+	echo "You need to be root to create/destroy ramdisks."
+	echo "Maybe try sudo ./ram-compilesession"
+	echo "Halted."
 	exit 1
 fi
 }
