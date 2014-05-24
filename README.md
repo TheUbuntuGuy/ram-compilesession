@@ -6,10 +6,10 @@ RAM-compilesession is a management script for creating, initializing, saving, an
 
 This script can be used for setting up an environment for compiling any application that uses cmake.
 
-## Why would I ues it?
+## Why would I use it?
 
-Best to use an example...
-In my case, I have all my source code on a file server. This means that linking large C applications is very time consuming. A single code change may take 1 second to compile but 90 seconds to link. Very ineffective use of my time. This script can get that time down dramatically, in my case down to 1 second. Compiling is also sped up, but not nearly as much.
+Best to use an example.
+In my case, I have all my source code on a file server. This means that linking large C/C++ applications is very time consuming. A single code change may take 1 second to compile but 90 seconds to link. Very ineffective use of my time. This script can get that time down dramatically, in my case down to 1 second. Compiling is also sped up, but not nearly as much.
 
 ## How does it work?
 
@@ -26,7 +26,7 @@ When you want to start working, run:
 This creates a ramdisk and loads any previous build files into it.
 If they don't exist, it creates them by running cmake.
 
-Continue to edit code where it resides on disk. No sources exist on the ramdisk, so no risk of losing work.
+Continue to edit code as normal where it resides on disk. No sources exist on the ramdisk, so no risk of losing work.
 Compiling and linking will be super fast as they are operating in a ramdisk.
 
 At any time just run:
