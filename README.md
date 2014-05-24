@@ -1,7 +1,7 @@
 RAM-compilesession
 =====================
 
-# What is it?
+## What is it?
 RAM-compilesession is a management script for creating, initializing, saving, and destroying a ramdisk for the purpose of using it to compile and link an application that uses cmake.
 
 This script can be used for setting up an environment for compiling any application that uses cmake.
@@ -14,6 +14,10 @@ In my case, I have all my source code on a file server. This means that linking 
 ## How does it work?
 
 Linking is a very I/O intensive operation when lots of files are involved. By placing all the object files in a ramdisk, they can be linked at ridiculous speeds. The source files are not moved from their original location on nonvolatile storage, so they can be confidently saved at any time.
+
+## What do I need?
+
+An application to compile that uses cmake, and Linux. That's it.
 
 ## How do I use it?
 
@@ -45,3 +49,7 @@ This saves the contents of the ramdisk to nonvolatile storage and destroys the r
 
 Open the ram-compilesession file and at the top are 7 parameters that can be changed.
 They are all explained in the file. Be sure to set these before running anything!
+
+### Notes
+
+This is definitely not as polished as I would like it to be. More work needs to be done, and more features need to be added. These will come with time.
