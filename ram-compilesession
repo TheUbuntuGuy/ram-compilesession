@@ -194,6 +194,9 @@ case "$1" in
 		printf "Unmounting ramdisk..."
 		umount $RAMDISKMNTPT
 		if [ ! $? -eq 0 ]; then
+			if [ $(lsof | grep "bash" | grep $RAMDISKMNTPT | wc -l) -ne 0 ]; then
+				echo "It looks like you are still using $RAMDISKMNTPT in a shell."
+			fi
 			echo "Could not umount ramdisk. Halted."
 			exit 11
 		fi
@@ -217,6 +220,9 @@ case "$1" in
 		printf "Destroying ramdisk..."
 		umount $RAMDISKMNTPT
 		if [ ! $? -eq 0 ]; then
+			if [ $(lsof | grep "bash" | grep $RAMDISKMNTPT | wc -l) -ne 0 ]; then
+				echo "It looks like you are still using $RAMDISKMNTPT in a shell."
+			fi
 			echo "Could not umount ramdisk. Halted."
 			exit 11
 		fi
