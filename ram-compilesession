@@ -3,9 +3,9 @@
 ###############################################################################
 
 # RAMdisk Compile Manager
-# Version 0.1
+# Version 0.2
 #
-# Copyright 2014 Mark Furneaux, Romaco Canada
+# Copyright 2014-2015 Mark Furneaux, Romaco Canada
 
 ###############################################################################
 
@@ -20,14 +20,16 @@ RAMDISKMNTPT="/mnt"
 RAMDISKDIR="/mnt/clementine-ram"
 # The non-volatile directory for saving the ramdisk contents
 NVDISKDIR="/media/mark/storage/Projects/clementine-ram"
-# The non-volatile directory containing the root of the project
-NVSOURCEDIR="/media/mark/storage/Projects/clementine-tug"
+# Whether to automatically run cmake if no Makefile is detected
+RUNCMAKE="no"
+# The non-volatile directory containing the root of the project, only needed for cmake
+NVSOURCEDIR="/media/mark/storage/Projects/clementine"
 # The size of the ramdisk. Takes parameters such as k, m, g, t.
 # Be careful to not use too much available RAM
 RAMDISKSIZE="2g"
-# The owner of any files and folders this script needs to create
+# The owner of any files and folders this script needs to create when using cmake
 FILEOWNER="mark"
-# The group of any files and folders this script needs to create
+# The group of any files and folders this script needs to create when using cmake
 # In most cases, set this to the same as the owner
 FILEGROUP="mark"
 
@@ -37,7 +39,7 @@ function printHelp {
 	echo "Usage: ram-compilesession <action>
 
 Where <action> can be one of the following:
-    loadsession    : Creates a ramdisk and loads the previous cmake files
+    loadsession    : Creates a ramdisk and loads the previous files
                      into it if they exist, or creates them if they don't
     saveram        : Saves the contents of the ramdisk onto disk
     endsession     : Saves the contents of the ramdisk onto disk and
@@ -51,6 +53,7 @@ You will need root access to create/destroy ramdisks
 The ramdisk is mounted to: $RAMDISKMNTPT
 The ramdisk directory is: $RAMDISKDIR
 The ramdisk save directory is: $NVDISKDIR
+Automatically run cmake?: $RUNCMAKE
 The source directory is: $NVSOURCEDIR
 The size of the ramdisk is: $RAMDISKSIZE
 The owner of the build files should be: $FILEOWNER
@@ -146,7 +149,7 @@ case "$1" in
 		printf "Loading session from disk..."
 		loadRam
 		printf " Done\n"
-		if [ ! -s $RAMDISKDIR/Makefile ]
+		if [ ! -s $RAMDISKDIR/Makefile ] && [ $RUNCMAKE -eq "yes" ]
 		then
 			echo "Makefile not found. Running cmake..."
 			if [ ! -d $RAMDISKDIR ]; then
