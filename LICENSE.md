@@ -1,4 +1,4 @@
-Copyright (c) 2014, Mark Furneaux, Romaco Canada
+Copyright (c) 2014-2015, Mark Furneaux, Romaco Canada
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
